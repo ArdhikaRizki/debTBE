@@ -6,46 +6,60 @@ import { Pool } from 'pg';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
-  private prisma: PrismaClient;
-  private pool: Pool;
+  private prisma: PrismaClient | null = null;
+  private pool: Pool | null = null;
 
   constructor() {
-    this.pool = new Pool({ connectionString: process.env.DATABASE_URL });
-    const adapter = new PrismaPg(this.pool);
-    this.prisma = new PrismaClient({ adapter });
+    // Empty; initialization deferred to onModuleInit
   }
 
   async onModuleInit() {
+    // Delay Pool + Prisma initialization until env is guaranteed loaded
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL is not set in environment variables');
+    }
+    
+    this.pool = new Pool({ connectionString });
+    const adapter = new PrismaPg(this.pool);
+    this.prisma = new PrismaClient({ adapter });
     await this.prisma.$connect();
   }
 
   async onModuleDestroy() {
-    await this.prisma.$disconnect();
-    await this.pool.end();
+    if (this.prisma) await this.prisma.$disconnect();
+    if (this.pool) await this.pool.end();
+  }
+
+  private getPrisma(): PrismaClient {
+    if (!this.prisma) {
+      throw new Error('PrismaService not initialized. Check that DATABASE_URL is set and onModuleInit completed.');
+    }
+    return this.prisma;
   }
 
   // Expose Prisma Client methods
   get user() {
-    return this.prisma.user;
+    return this.getPrisma().user;
   }
 
   get debt() {
-    return this.prisma.debt;
+    return this.getPrisma().debt;
   }
 
   get debtGroup() {
-    return this.prisma.debtGroup;
+    return this.getPrisma().debtGroup;
   }
 
   get groupMember() {
-    return this.prisma.groupMember;
+    return this.getPrisma().groupMember;
   }
 
   get groupTransaction() {
-    return this.prisma.groupTransaction;
+    return this.getPrisma().groupTransaction;
   }
 
   get settlementRequest() {
-    return this.prisma.settlementRequest;
+    return this.getPrisma().settlementRequest;
   }
 }
