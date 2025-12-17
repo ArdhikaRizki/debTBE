@@ -54,3 +54,65 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Prisma
+# Note: @prisma/client di node_modules sudah di-ignore otomatis
+# Tapi kalau pakai custom output, uncomment line berikut:
+# /src/generated
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Editor backup files
+*~
+*.swp
+*.swo
+*#
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Package manager lock files (optional - uncomment jika tidak ingin commit)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Build outputs
+*.tsbuildinfo
+
+# Test & Coverage
+/coverage
+/.nyc_output
+/test-results
+/playwright-report
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Deployment
+.vercel
+.netlify
+
+# Local development
+.env.local
+.env.*.local

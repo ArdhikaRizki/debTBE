@@ -1,0 +1,95 @@
+# Debt Management API - Test File
+# Install "REST Client" extension di VS Code untuk pakai file ini
+# Atau copy-paste ke Postman
+
+@baseUrl = http://localhost:3000
+@token = YOUR_TOKEN_HERE
+
+### Health Check
+GET {{baseUrl}}
+
+###############################################
+# AUTHENTICATION
+###############################################
+
+### 1. Register User Baru
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123",
+  "name": "Test User",
+  "email": "test@example.com"
+}
+
+### 2. Register User Kedua (untuk testing)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "user2",
+  "password": "password123",
+  "name": "User Two",
+  "email": "user2@example.com"
+}
+
+### 3. Login
+# Setelah login, copy access_token dan paste ke variable @token di atas
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+
+### 4. Login User Kedua
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "user2",
+  "password": "password123"
+}
+
+###############################################
+# USER ENDPOINTS (PROTECTED)
+###############################################
+
+### 5. Get User Profile (butuh token)
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+
+### 6. Get All Users (butuh token)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+
+###############################################
+# ERROR CASES - Testing Protection
+###############################################
+
+### 7. Access Profile tanpa Token (harus error 401)
+GET {{baseUrl}}/users/profile
+
+### 8. Access dengan Token Invalid (harus error 401)
+GET {{baseUrl}}/users/profile
+Authorization: Bearer invalid-token-here
+
+### 9. Login dengan Password Salah (harus error 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "wrongpassword"
+}
+
+### 10. Login dengan Username yang Tidak Ada (harus error 401)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "notexist",
+  "password": "password123"
+}

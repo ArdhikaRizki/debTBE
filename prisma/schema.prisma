@@ -1,0 +1,251 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// model Users {
+//   id String @id @default(uuid())
+//   username String @unique
+//   password String @db.VarChar(255)
+//   name String @db.VarChar(255)
+//   email String @unique @db.VarChar(255)
+//   profileImage String? // URI/URL gambar 
+  
+//   // Relasi dengan nama berbeda
+//   debts Debt[] // Debt yang dimiliki user
+//   createdGroups DebtGroup[] @relation("GroupCreator") // Grup yang dibuat user
+//   groupMemberships GroupMember[] // Membership di grup
+//   transactionsFrom GroupTransaction[] @relation("TransactionFrom") // Transaksi dari user ini
+//   transactionsTo GroupTransaction[] @relation("TransactionTo") // Transaksi ke user ini
+//   createdTransactions GroupTransaction[] @relation("TransactionCreator") // Transaksi yang dibuat user ini
+//   settlementsFrom SettlementRequest[] @relation("SettlementFrom") // Settlement yang dibuat user ini (pembayar)
+//   settlementsTo SettlementRequest[] @relation("SettlementTo") // Settlement yang diterima user ini (penerima)
+//   reviewedSettlements SettlementRequest[] @relation("SettlementReviewer") // Settlement yang direview user ini
+// }
+
+// model Debt {
+//   id String @id @default(uuid())
+//   userId String // foreign key ke Users
+//   user Users @relation(fields: [userId], references: [id])
+//   type String @db.VarChar(50) // 'hutang' | 'piutang'
+//   name String @db.VarChar(255) // Nama orang yang terlibat
+//   otherUserId String? @db.VarChar(255) // ID user lawan (jika menggunakan @username)
+//   amount Float
+//   description String @db.Text
+//   date DateTime
+//   isPaid Boolean @default(false)
+//   groupId String? @db.VarChar(255) // Optional: ID grup jika debt ini bagian dari grup
+//   status String @default("pending") @db.VarChar(50) // 'pending' | 'confirmed' | 'rejected' | 'settlement_requested'
+//   initiatedBy String @db.VarChar(255) // User yang create transaksi
+//   approvedBy String? @db.VarChar(255) // User yang approve
+//   approvedAt DateTime? // Timestamp approval
+//   rejectionReason String? @db.Text // Alasan reject
+// }
+
+// model DebtGroup {
+//   id String @id @default(uuid())
+//   name String @db.VarChar(255)
+//   description String @db.Text
+//   creatorId String // foreign key ke Users
+//   creator Users @relation("GroupCreator", fields: [creatorId], references: [id])
+  
+//   members GroupMember[] // Relasi many-to-many lewat tabel junction
+//   transactions GroupTransaction[] // Transaksi dalam grup
+//   settlements SettlementRequest[] // Settlement request dalam grup
+//   createdAt DateTime @default(now())
+//   isActive Boolean @default(true)
+//   profileImage String? @db.VarChar(255) // URI/URL gambar profile
+// }
+
+// // Tabel junction untuk many-to-many relationship
+// model GroupMember {
+//   id String @id @default(uuid())
+//   groupId String
+//   group DebtGroup @relation(fields: [groupId], references: [id])
+//   userId String
+//   user Users @relation(fields: [userId], references: [id])
+//   joinedAt DateTime @default(now())
+  
+//   @@unique([groupId, userId]) // Satu user tidak bisa join grup yang sama 2x
+// }
+
+// model GroupTransaction {
+//   id String @id @default(uuid())
+//   groupId String
+//   group DebtGroup @relation(fields: [groupId], references: [id])
+//   fromUserId String // foreign key - User yang berhutang
+//   fromUser Users @relation("TransactionFrom", fields: [fromUserId], references: [id])
+//   toUserId String // foreign key - User yang dibayar
+//   toUser Users @relation("TransactionTo", fields: [toUserId], references: [id])
+//   amount Float
+//   description String @db.Text
+//   date DateTime
+//   isPaid Boolean @default(false)
+//   createdBy String // foreign key - User yang menginput transaksi ini
+//   creator Users @relation("TransactionCreator", fields: [createdBy], references: [id])
+//   createdAt DateTime @default(now())
+// }
+
+// model SettlementRequest {
+//   id String @id @default(uuid())
+//   groupId String
+//   group DebtGroup @relation(fields: [groupId], references: [id])
+//   fromUserId String // foreign key - User yang membayar (penghutang)
+//   fromUser Users @relation("SettlementFrom", fields: [fromUserId], references: [id])
+//   toUserId String // foreign key - User yang menerima (pemberi hutang)
+//   toUser Users @relation("SettlementTo", fields: [toUserId], references: [id])
+//   amount Float
+//   description String @db.Text
+//   status String @default("pending") @db.VarChar(50) // 'pending' | 'approved' | 'rejected'
+//   createdAt DateTime @default(now())
+//   reviewedAt DateTime?
+//   reviewedBy String? // foreign key - User yang review
+//   reviewer Users? @relation("SettlementReviewer", fields: [reviewedBy], references: [id])
+//   rejectionReason String? @db.Text
+// }
+
+
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid()
+  username     String   @unique @db.VarChar(50)
+  password     String   @db.VarChar(255)
+  name         String   @db.VarChar(100)
+  email        String   @unique @db.VarChar(100)
+  profileImage String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relasi
+  debts                Debt[]               @relation("UserDebts")
+  debtOthers           Debt[]              @relation("DebtOtherUser")
+  createdGroups        DebtGroup[]         @relation("GroupCreator")
+  groupMemberships     GroupMember[]
+  transactionsFrom     GroupTransaction[]  @relation("TransactionFrom")
+  transactionsTo       GroupTransaction[]  @relation("TransactionTo")
+  createdTransactions  GroupTransaction[]  @relation("TransactionCreator")
+  settlementsFrom      SettlementRequest[] @relation("SettlementFrom")
+  settlementsTo        SettlementRequest[] @relation("SettlementTo")
+  reviewedSettlements  SettlementRequest[] @relation("SettlementReviewer")
+
+  @@map("users")
+}
+
+model Debt {
+  id              String    @id @default(uuid()) @db.Uuid()
+  userId          String    @db.Uuid()
+  user            User      @relation("UserDebts", fields: [userId], references: [id], onDelete: Cascade)
+  type            String    @db.VarChar(10) // 'hutang' | 'piutang'
+  name            String    @db.VarChar(100)
+  otherUserId     String?   @db.Uuid()
+  otherUser       User?     @relation("DebtOtherUser", fields: [otherUserId], references: [id], onDelete: SetNull)
+  amount          Decimal   @db.Decimal(15, 2)
+  description     String    @db.Text
+  date            DateTime  @db.Date
+  isPaid          Boolean   @default(false)
+  groupId         String?   @db.Uuid()
+  status          String    @default("confirmed") @db.VarChar(25) // 'pending' | 'confirmed' | 'rejected' | 'settlement_requested'
+  initiatedBy     String    @db.Uuid()
+  approvedBy      String?   @db.Uuid()
+  approvedAt      DateTime?
+  rejectionReason String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([otherUserId])
+  @@index([status])
+  @@index([isPaid])
+  @@map("debts")
+}
+
+model DebtGroup {
+  id           String   @id @default(uuid()) @db.Uuid()
+  name         String   @db.VarChar(100)
+  description  String   @db.Text
+  creatorId    String   @db.Uuid()
+  creator      User     @relation("GroupCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  isActive     Boolean  @default(true)
+  groupImage   String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  members      GroupMember[]
+  transactions GroupTransaction[]
+  settlements  SettlementRequest[]
+
+  @@index([creatorId])
+  @@index([isActive])
+  @@map("debt_groups")
+}
+
+model GroupMember {
+  id       String   @id @default(uuid()) @db.Uuid()
+  groupId  String   @db.Uuid()
+  group    DebtGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String   @db.Uuid()
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+  @@map("group_members")
+}
+
+model GroupTransaction {
+  id          String    @id @default(uuid()) @db.Uuid()
+  groupId     String    @db.Uuid()
+  group       DebtGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromUserId  String    @db.Uuid()
+  fromUser    User      @relation("TransactionFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId    String    @db.Uuid()
+  toUser      User      @relation("TransactionTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  amount      Decimal   @db.Decimal(15, 2)
+  description String    @db.Text
+  date        DateTime
+  isPaid      Boolean   @default(false)
+  createdBy   String    @db.Uuid()
+  creator     User      @relation("TransactionCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([groupId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([isPaid])
+  @@map("group_transactions")
+}
+
+model SettlementRequest {
+  id              String    @id @default(uuid()) @db.Uuid()
+  groupId         String    @db.Uuid()
+  group           DebtGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromUserId      String    @db.Uuid()
+  fromUser        User      @relation("SettlementFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId        String    @db.Uuid()
+  toUser          User      @relation("SettlementTo", fields: [toUserId], references: [id], onDelete: Cascade)
+  amount          Decimal   @db.Decimal(15, 2)
+  description     String    @db.Text
+  status          String    @default("pending") @db.VarChar(20) // 'pending' | 'approved' | 'rejected'
+  rejectionReason String?   @db.Text
+  reviewedBy      String?   @db.Uuid()
+  reviewer        User?     @relation("SettlementReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([groupId])
+  @@index([toUserId])
+  @@index([status])
+  @@map("settlement_requests")
+}
