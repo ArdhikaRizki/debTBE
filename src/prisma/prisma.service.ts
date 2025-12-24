@@ -62,4 +62,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   get settlementRequest() {
     return this.getPrisma().settlementRequest;
   }
+
+  get paymentMethod() {
+    return this.getPrisma().paymentMethod;
+  }
 }

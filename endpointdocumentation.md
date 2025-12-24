@@ -570,6 +570,308 @@ curl -X DELETE http://localhost:3000/debts/activities
 
 ---
 
+## Payment Method Endpoints
+
+### 13. Create Payment Method
+**Endpoint:** `POST /payment-methods`
+
+**Description:** Add a new payment method for the authenticated user. **Requires JWT token.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Request Body:**
+```json
+{
+  "type": "bank_transfer" | "credit_card" | "e_wallet" | "cash",
+  "provider": "BCA" | "Mandiri" | "OVO" | "DANA" | "Visa" | "Mastercard",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": boolean (optional, default: false)
+}
+```
+
+**Response (201):**
+```json
+{
+  "id": "string",
+  "userId": "string",
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": boolean,
+  "isActive": true,
+  "createdAt": "2025-12-24T10:30:00Z",
+  "updatedAt": "2025-12-24T10:30:00Z"
+}
+```
+
+**Example cURL:**
+```bash
+curl -X POST http://localhost:3000/payment-methods \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "bank_transfer",
+    "provider": "BCA",
+    "accountNumber": "123456789",
+    "accountHolder": "Alice Smith",
+    "isPrimary": true
+  }'
+```
+
+---
+
+### 14. Get All Payment Methods
+**Endpoint:** `GET /payment-methods`
+
+**Description:** Get all payment methods for the authenticated user. **Requires JWT token.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200):**
+```json
+[
+  {
+    "id": "string",
+    "userId": "string",
+    "type": "string",
+    "provider": "string",
+    "accountNumber": "string",
+    "accountHolder": "string",
+    "isPrimary": boolean,
+    "isActive": boolean,
+    "createdAt": "ISO8601 datetime",
+    "updatedAt": "ISO8601 datetime"
+  }
+]
+```
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:3000/payment-methods \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+---
+
+### 15. Get Primary Payment Method
+**Endpoint:** `GET /payment-methods/primary`
+
+**Description:** Get the primary payment method for the authenticated user. **Requires JWT token.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Response (200):**
+```json
+{
+  "id": "string",
+  "userId": "string",
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": true,
+  "isActive": true,
+  "createdAt": "ISO8601 datetime",
+  "updatedAt": "ISO8601 datetime"
+}
+```
+
+**Response (204) - No primary set:**
+```
+null
+```
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:3000/payment-methods/primary \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+---
+
+### 16. Get Payment Method by ID
+**Endpoint:** `GET /payment-methods/:id`
+
+**Description:** Get a specific payment method by ID. **Requires JWT token. Only owner can access.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Path Parameters:**
+- `id`: Payment method ID
+
+**Response (200):**
+```json
+{
+  "id": "string",
+  "userId": "string",
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": boolean,
+  "isActive": boolean,
+  "createdAt": "ISO8601 datetime",
+  "updatedAt": "ISO8601 datetime"
+}
+```
+
+**Error (404):**
+```json
+{
+  "statusCode": 404,
+  "message": "Payment method not found"
+}
+```
+
+**Example cURL:**
+```bash
+curl -X GET http://localhost:3000/payment-methods/pm-uuid-here \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+---
+
+### 17. Update Payment Method
+**Endpoint:** `PUT /payment-methods/:id`
+
+**Description:** Update a payment method. **Requires JWT token. Only owner can update.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Path Parameters:**
+- `id`: Payment method ID
+
+**Request Body:** (all fields optional)
+```json
+{
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": boolean,
+  "isActive": boolean
+}
+```
+
+**Response (200):**
+```json
+{
+  "id": "string",
+  "userId": "string",
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": boolean,
+  "isActive": boolean,
+  "createdAt": "ISO8601 datetime",
+  "updatedAt": "ISO8601 datetime"
+}
+```
+
+**Example cURL:**
+```bash
+curl -X PUT http://localhost:3000/payment-methods/pm-uuid-here \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "accountHolder": "Alice Johnson",
+    "isPrimary": false
+  }'
+```
+
+---
+
+### 18. Delete Payment Method
+**Endpoint:** `DELETE /payment-methods/:id`
+
+**Description:** Delete a payment method. **Requires JWT token. Only owner can delete.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Path Parameters:**
+- `id`: Payment method ID
+
+**Response (200):**
+```json
+{
+  "ok": true
+}
+```
+
+**Error (404):**
+```json
+{
+  "statusCode": 404,
+  "message": "Payment method not found"
+}
+```
+
+**Example cURL:**
+```bash
+curl -X DELETE http://localhost:3000/payment-methods/pm-uuid-here \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+---
+
+### 19. Set as Primary Payment Method
+**Endpoint:** `POST /payment-methods/:id/set-primary`
+
+**Description:** Set a payment method as primary (automatically unsets other primary). **Requires JWT token. Only owner can set.**
+
+**Headers:**
+```
+Authorization: Bearer {access_token}
+```
+
+**Path Parameters:**
+- `id`: Payment method ID
+
+**Response (200):**
+```json
+{
+  "id": "string",
+  "userId": "string",
+  "type": "string",
+  "provider": "string",
+  "accountNumber": "string",
+  "accountHolder": "string",
+  "isPrimary": true,
+  "isActive": boolean,
+  "createdAt": "ISO8601 datetime",
+  "updatedAt": "ISO8601 datetime"
+}
+```
+
+**Example cURL:**
+```bash
+curl -X POST http://localhost:3000/payment-methods/pm-uuid-here/set-primary \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+---
+
 ## Summary Table
 
 | Method | Endpoint | Description | Auth Required |
@@ -586,6 +888,13 @@ curl -X DELETE http://localhost:3000/debts/activities
 | GET | `/debts/activities/:userId` | Get user activities | No |
 | POST | `/debts/activity` | Log activity | No |
 | DELETE | `/debts/activities` | Clear activities | No |
+| POST | `/payment-methods` | Create payment method | Yes |
+| GET | `/payment-methods` | Get all payment methods | Yes |
+| GET | `/payment-methods/primary` | Get primary payment method | Yes |
+| GET | `/payment-methods/:id` | Get payment method by ID | Yes |
+| PUT | `/payment-methods/:id` | Update payment method | Yes |
+| DELETE | `/payment-methods/:id` | Delete payment method | Yes |
+| POST | `/payment-methods/:id/set-primary` | Set as primary | Yes |
 
 ---
 
