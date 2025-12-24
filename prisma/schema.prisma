@@ -136,6 +136,7 @@ model User {
   settlementsFrom      SettlementRequest[] @relation("SettlementFrom")
   settlementsTo        SettlementRequest[] @relation("SettlementTo")
   reviewedSettlements  SettlementRequest[] @relation("SettlementReviewer")
+  paymentMethods       PaymentMethod[]
 
   @@map("users")
 }
@@ -248,4 +249,21 @@ model SettlementRequest {
   @@index([toUserId])
   @@index([status])
   @@map("settlement_requests")
+}
+model PaymentMethod {
+  id            String   @id @default(uuid()) @db.Uuid()
+  userId        String   @db.Uuid()
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type          String   @db.VarChar(50) // 'bank_transfer' | 'credit_card' | 'e_wallet' | 'cash'
+  provider      String   @db.VarChar(100) // 'BCA' | 'Mandiri' | 'OVO' | 'DANA' etc
+  accountNumber String   @db.VarChar(50)
+  accountHolder String   @db.VarChar(100)
+  isPrimary     Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([isPrimary])
+  @@map("payment_methods")
 }

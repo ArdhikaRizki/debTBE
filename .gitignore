@@ -116,3 +116,4 @@ yarn-error.log*
 # Local development
 .env.local
 .env.*.local
+prisma/migrations/20251224152821_add/migration.sql
