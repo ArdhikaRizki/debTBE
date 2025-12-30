@@ -25,8 +25,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # Koneksi ke DB pakai nama service: db-postgres
       DATABASE_URL: postgresql://user_ganteng:SueWWKeTsg@db-postgres:5432/debt
+      JWT_SECRET: "e7d9fa1eb45a504370c3714fd7dbb3432ef9c89f00409a59b20d193c20a938c3db325ef21ef4076eadda5668bcd9bb154c17b2b8c18fa5b218ccf23480ef6e2f"
+
     # Perintah: Migrate database dulu baru nyalain aplikasi
     command: sh -c "npx prisma migrate deploy && node dist/main"
 
