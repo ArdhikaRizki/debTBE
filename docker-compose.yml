@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     # Perintah: Migrate database dulu baru nyalain aplikasi
-    command: sh -c "npx prisma migrate deploy && node dist/main"
+    command: sh -c "npx prisma migrate deploy && node dist/src/main"
 
   # 3. PORTAINER (Si Visual Dashboard)
   portainer:

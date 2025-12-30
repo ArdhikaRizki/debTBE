@@ -11,17 +11,19 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-# --- STAGE 2: PRAMUSAJI (FINAL IMAGE) ---
+# --- STAGE 2 (RUNNER) ---
 FROM node:20-alpine
 WORKDIR /usr/src/app
 
-# Cuma copy file yang dibutuhin buat JALAN doang
-# Kita gak butuh file .ts lagi, cuma butuh folder dist & node_modules
-COPY --from=builder /usr/src/app/dist ./dist
+# Ambil semuanya yang penting dari builder
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package*.json ./
 COPY --from=builder /usr/src/app/prisma ./prisma
 COPY --from=builder /usr/src/app/prisma.config.ts ./
 
+# Pastikan copy folder dist ke folder dist lagi di Stage 2
+COPY --from=builder /usr/src/app/dist ./dist
+
 EXPOSE 3000
-CMD ["node", "dist/main"]
+# Gunakan node dist/main.js sebagai default
+CMD ["node", "dist/main.js"]
