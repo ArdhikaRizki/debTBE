@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   # 1. DATABASE
@@ -50,7 +50,7 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - /etc/letsencrypt:/etc/letsencrypt # Jika SSL sudah ada di server
     depends_on:
-      - nestjs-app
+      - my-backend
 
 volumes:
   pgdata:
