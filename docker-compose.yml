@@ -40,6 +40,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt # Jika SSL sudah ada di server
+    depends_on:
+      - nestjs-app
+
 volumes:
   pgdata:
   portainer_data:
