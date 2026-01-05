@@ -7,9 +7,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:8081', // Ganti dengan URL frontend kamu
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: '*', // Allow all origins (for development) or specify your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type, Authorization, Accept',
   });
   
   
